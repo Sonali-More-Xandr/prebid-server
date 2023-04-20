@@ -25,7 +25,7 @@ jobs:
 
             # Check if the URL in each updated YAML file is updated
             for file in $updated_files; do
-              url_changed=$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.url' - | diff - <(git show ${GITHUB_SHA}:$file | yq e '.url' -) | wc -l)
+              url_changed=$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.userSync.redirect.url' - | diff - <(git show ${GITHUB_SHA}:$file | yq e '.userSync.redirect.url' -) | wc -l)
               if [ "$url_changed" -gt 0 ]; then
                 echo "URL is updated in $file"
               else
