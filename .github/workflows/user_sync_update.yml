@@ -1,35 +1,29 @@
-name: Bidder Info Update
+name: Check userSync.redirect.url in YAML files
 
 on:
-  push:
+  pull_request:
     paths:
-      - 'static/bidder-info/**.yaml'
+      - 'static/bidder-info/*.yaml'
+    types: [opened, reopened, synchronize]
 
 jobs:
-  build:
+  check_yaml_files:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          ref: ${{ github.base_ref }}
 
-      - name: Check if any .yaml file in static/bidder-info/{any-adapter} is updated
-        id: check-bidder-info-updated
+      - name: Install yq
+        run: sudo apt update && sudo apt install yq -y
+
+      - name: Check YAML files
         run: |
-          # Check if any .yaml file in static/bidder-info/{any-adapter} is updated
-          if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q '^static/bidder-info/.*\.yaml$'; then
-            # Get the list of updated YAML files
-            updated_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep '^static/bidder-info/.*\.yaml$')
-          
-            # Check if the URL or userMacro in each updated YAML file is updated
-            for file in $updated_files; do
-              echo $(yq eval '.userSync.redirect.url' $file)
-              if [[ $(yq e '.userSync.redirect.url' $file) == "null" || $(yq e '.userSync.redirect.url' $file) == "" ]]; then
-                echo "The url is not updated"
-              else
-                echo "The url is updated"
-              fi
-            done
-          fi
+          set -e
+          for file in $(git diff --name-only ${GITHUB_BASE_REF}..${GITHUB_HEAD_REF} | grep -E '^static/bidder-info/.*\.yaml$'); do
+            if [[ $(yq eval '.userSync.redirect.url' "$file") != "" ]]; then
+              echo "userSync.redirect.url was updated or added in $file"
+              exit 1
+            fi
+          done
