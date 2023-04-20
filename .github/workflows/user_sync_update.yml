@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Check if any .yaml file in static/bidder-info/{any-adapter} is updated
         id: check-bidder-info-updated
