@@ -32,7 +32,7 @@ jobs:
               fi
               # Extract the URL property from the updated YAML file and the previous commit's YAML file and compare them
               url_changed=$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.userSync.redirect.url' - 2> /dev/null | diff - <(git show ${GITHUB_SHA}:$file 2> /dev/null | yq e '.userSync.redirect.url' -) | wc -l)
-              echo "git diff: $(git diff ${GITHUB_BEFORE_SHA} ${GITHUB_AFTER_SHA} -- ${FILE})"
+              echo "$(git diff ${GITHUB_BEFORE_SHA} ${GITHUB_AFTER_SHA} -- ${FILE})"
               # Check if URL was removed from the file
               url_removed=$(yq e '.userSync.redirect.url' $file 2> /dev/null | grep -Eq '^$' && echo true || echo false)
               if [ $url_changed -gt 0 ] && [ "$url_removed" = "false" ]; then
