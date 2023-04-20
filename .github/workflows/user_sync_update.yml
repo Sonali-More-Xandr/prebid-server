@@ -27,9 +27,9 @@ jobs:
             for file in $updated_files; do
               echo $(yq eval '.userSync.redirect.url' $file)
               if [[ $(yq e '.userSync.redirect.url' $file) == "null" || $(yq e '.userSync.redirect.url' $file) == "" ]]; then
-                echo "The url is updated"
-              else
                 echo "The url is not updated"
+              else
+                echo "The url is updated"
               fi
             done
           fi
