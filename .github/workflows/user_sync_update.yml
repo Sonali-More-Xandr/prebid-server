@@ -28,7 +28,7 @@ jobs:
               url_changed=$(yq e '.redirect.url' $file | git diff --no-index - $file | grep -q '^\+' && echo true || echo false)
               usermacro_changed=$(yq e '.redirect.userMacro' $file | git diff --no-index - $file | grep -q '^\+' && echo true || echo false)
               if [ "$url_changed" = "true" ] || [ "$usermacro_changed" = "true" ]; then
-                echo "::set-output name=url-updated::true"
+                echo "URL is updated"
                 break
               fi
             done

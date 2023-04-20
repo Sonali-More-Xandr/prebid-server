@@ -1,0 +1,21 @@
+endpoint: "http://abc.com/openrtb2"
+platform_id: "5"
+maintainer:
+  email: "prebid@microsoft.com"
+gvlVendorID: 32
+capabilities:
+  app:
+    mediaTypes:
+      - banner
+      - video
+      - native
+  site:
+    mediaTypes:
+      - banner
+      - video
+      - native
+userSync:
+  key: "adnxs"
+  redirect:
+    url: "https://abc.com/getuid?{{.RedirectURL}}"
+    userMacro: "$uid"
