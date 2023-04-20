@@ -22,14 +22,22 @@ jobs:
           if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q '^static/bidder-info/.*\.yaml$'; then
             updated_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep '^static/bidder-info/.*\.yaml$')
             echo "Updated YAML files: $updated_files"
-
+          
             # Check if the URL in each updated YAML file is updated
             for file in $updated_files; do
-              url_changed=$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.userSync.redirect.url' - | diff - <(git show ${GITHUB_SHA}:$file | yq e '.userSync.redirect.url' -) | wc -l)
-              if [ "$url_changed" -gt 0 ]; then
-                echo "URL is updated in $file"
+              # Skip checking for URL changes in removed files
+              if [ ! -f "$file" ]; then
+                echo "File $file was removed, skipping URL check"
+                continue
+              fi
+              # Extract the URL property from the updated YAML file and the previous commit's YAML file and compare them
+              url_changed=$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.url' - 2> /dev/null | diff - <(git show ${GITHUB_SHA}:$file 2> /dev/null | yq e '.url' -) | wc -l)
+              # Check if URL was removed from the file
+              url_removed=$(yq e '.url' $file 2> /dev/null | grep -Eq '^$' && echo true || echo false)
+              if [ $url_changed -gt 0 ] && [ "$url_removed" = "false" ]; then
+                echo "URL in file $file is updated"
               else
-                echo "URL is not updated in $file"
+                echo "URL in file $file is not updated"
               fi
             done
           fi
