@@ -25,11 +25,6 @@ jobs:
           
             # Check if the URL or userMacro in each updated YAML file is updated
             for file in $updated_files; do
-              url_changed=$(yq e '.redirect.url' $file | git diff --no-index - $file | grep -q '^\+' && echo true || echo false)
-              usermacro_changed=$(yq e '.redirect.userMacro' $file | git diff --no-index - $file | grep -q '^\+' && echo true || echo false)
-              if [ "$url_changed" = "true" ] || [ "$usermacro_changed" = "true" ]; then
-                echo "URL is updated"
-                break
-              fi
+              echo $(yq eval '.userSync.redirect.url' $file)
             done
           fi
