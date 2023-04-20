@@ -26,10 +26,10 @@ jobs:
             # Check if the URL or userMacro in each updated YAML file is updated
             for file in $updated_files; do
               echo $(yq eval '.userSync.redirect.url' $file)
-              if [ -z "$(yq eval '.userSync.redirect.url' $file)" ]; then
-                echo "The output of yq is empty or null"
+              if [ $(yq eval '.userSync.redirect.url' $file) != '' ]; then
+                echo "The url is updated"
               else
-                echo "The output of yq is not empty or null"
+                echo "The url is not updated"
               fi
             done
           fi
