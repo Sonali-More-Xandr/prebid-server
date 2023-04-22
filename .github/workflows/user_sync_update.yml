@@ -1,34 +1,44 @@
-name: Bidder Info Update
+name: Check Bidder Info Yaml Files
 
 on:
-  push:
-    paths:
-      - 'static/bidder-info/**.yaml'
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
-  build:
+  check_yaml_files:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Check if any .yaml file is updated
-        id: check-bidder-info-updated
+      - name: Check for changes in static/bidder-info/*.yaml files
+        id: check_changes
         run: |
-          file_path="static/bidder-info/"
-          for file in $(git diff-tree --no-commit-id --name-only -r HEAD | grep "^$file_path"); do
-            if [[ ! -e "$file" ]]; then
-              echo "File $file does not exist"
-              continue
-            fi
+          changed_files=$(git diff --name-only HEAD^ HEAD | grep -E '^static/bidder-info/.*\.yaml$' || true)
+          echo "::set-output name=changed_files::$changed_files"
 
-            url_changed=$(yq eval ".userSync.redirect.url as \$new | input | .userSync.redirect.url as \$old | if \$new == \$old then empty else \$new end" $file <(git show origin/master:$file 2> /dev/null))
-            macro_changed=$(yq eval ".userSync.redirect.userMacro as \$new | input | .userSync.redirect.userMacro as \$old | if \$new == \$old then empty else \$new end" $file <(git show origin/master:$file 2> /dev/null))
-
-            if [ -n "$url_changed" ] || [ -n "$macro_changed" ]; then
-              echo "URL/UserMacro is updated in file $file"
+      - name: Check userSync.redirect.url in updated/added YAML files
+        if: steps.check_changes.outputs.changed_files != ''
+        run: |
+          for file in ${{ steps.check_changes.outputs.changed_files }}; do
+            if [ -f "$file" ]; then
+              if git diff HEAD^ HEAD --quiet -- "$file"; then
+                echo "File $file was added in this PR"
+                if yq eval '.userSync.redirect.url' "$file" > /dev/null; then
+                  echo "userSync.redirect.url found in $file"
+                else
+                  echo "userSync.redirect.url not found in $file"
+                fi
+              else
+                echo "File $file was updated in this PR"
+                if yq eval '.userSync.redirect.url' "$file" > /dev/null; then
+                  echo "userSync.redirect.url was updated in $file"
+                else
+                  echo "userSync.redirect.url was not updated in $file"
+                fi
+              fi
             fi
           done
