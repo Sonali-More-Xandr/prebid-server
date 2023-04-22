@@ -31,17 +31,13 @@ jobs:
                 continue
               fi
               # Extract the URL property from the updated YAML file and the previous commit's YAML file and compare them
-              echo "git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.userSync.redirect.url' - 2> /dev/null"
-              echo "$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.userSync.redirect.url' - 2> /dev/null)"
-              echo "diff - <(git show ${GITHUB_SHA}:$file 2> /dev/null | yq e '.userSync.redirect.url' -)"
-              echo "$(diff - <(git show ${GITHUB_SHA}:$file 2> /dev/null | yq e '.userSync.redirect.url' -))"
-              url_changed=$(git diff ${{ github.event.before }} ${{ github.event.after }} -- $file | yq e '.userSync.redirect.url' - 2> /dev/null | diff - <(git show ${GITHUB_SHA}:$file 2> /dev/null | yq e '.userSync.redirect.url' -) | wc -l)
+              url_changed=$(yq e --exit-status ".userSync.redirect.url as \$prev | inputs | .userSync.redirect.url != \$prev" ${{ github.event.before }} $file)
               # Check if URL was removed from the file
-              url_removed=$(yq e '.userSync.redirect.url' $file 2> /dev/null | grep -Eq '^$' && echo true || echo false)
-              if [ $url_changed -gt 0 ] && [ "$url_removed" = "false" ]; then
-                echo "URL in file $file is updated"
-              else
+              url_removed=$(yq e --exit-status '.userSync.redirect.url == ""' $file 2>/dev/null && echo true || echo false)
+              if [ $url_changed -eq 0 ] && [ "$url_removed" = "false" ]; then
                 echo "URL in file $file is not updated"
+              else
+                echo "URL in file $file is updated"
               fi
             done
           fi
