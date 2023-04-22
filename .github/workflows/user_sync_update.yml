@@ -25,6 +25,7 @@ jobs:
         run: |
           for file in ${{ steps.check_changes.outputs.changed_files }}; do
             if [ -f "$file" ]; then
+              cat "$file"
               if git diff HEAD^ HEAD --quiet -- "$file"; then
                 echo "File $file was added in this PR"
                 if yq eval '.userSync.redirect.url' "$file" > /dev/null; then
