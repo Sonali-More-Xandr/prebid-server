@@ -3,7 +3,7 @@ name: Bidder Info Update
 on:
   push:
     paths:
-      - './static/bidder-info/**.yaml'
+      - 'static/bidder-info/**.yaml'
 
 jobs:
   build:
@@ -18,15 +18,17 @@ jobs:
       - name: Check if any .yaml file is updated
         id: check-bidder-info-updated
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q '^static/bidder-info/.*\.yaml$'; then
-            updated_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep '^static/bidder-info/.*\.yaml$')
-            echo "Updated Files: $updated_files"
-          
-            for file in $updated_files; do
-              url_changed=$(yq eval ".userSync.redirect.url as \$new | input | .userSync.redirect.url as \$old | if \$new == \$old then empty else \$new end" $file <(git show ${GITHUB_SHA}:$file) | grep -q '^[^ ]' && echo true || echo false)
-              macro_changed=$(yq eval ".userSync.userMacro as \$new | input | .userSync.userMacro as \$old | if \$new == \$old then empty else \$new end" $file <(git show ${GITHUB_SHA}:$file) | grep -q '^[^ ]' && echo true || echo false)
-              if [ "$url_changed" = "true" ] || [ "$macro_changed" = "true" ]; then
-                echo "URL/UserMacro is updated"
-              fi
-            done
-          fi
+          file_path="static/bidder-info/"
+          for file in $(git diff-tree --no-commit-id --name-only -r HEAD | grep "^$file_path"); do
+            if [[ ! -e "$file" ]]; then
+              echo "File $file does not exist"
+              continue
+            fi
+
+            url_changed=$(yq eval ".userSync.redirect.url as \$new | input | .userSync.redirect.url as \$old | if \$new == \$old then empty else \$new end" $file <(git show origin/master:$file 2> /dev/null))
+            macro_changed=$(yq eval ".userSync.redirect.userMacro as \$new | input | .userSync.redirect.userMacro as \$old | if \$new == \$old then empty else \$new end" $file <(git show origin/master:$file 2> /dev/null))
+
+            if [ -n "$url_changed" ] || [ -n "$macro_changed" ]; then
+              echo "URL/UserMacro is updated in file $file"
+            fi
+          done
