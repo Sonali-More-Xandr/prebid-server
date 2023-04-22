@@ -41,7 +41,7 @@ jobs:
                 fi
                 git diff HEAD^ HEAD -- "$file" > diff.yaml
                 cat diff.yaml
-                echo "$(yq eval '.userSync.redirect.url' "$file")"
+                echo "$(yq eval '.userSync.redirect.url' diff.yaml)"
               fi
             fi
           done
