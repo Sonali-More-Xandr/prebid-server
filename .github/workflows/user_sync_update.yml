@@ -3,7 +3,7 @@ name: Bidder Info Update
 on:
   push:
     paths:
-      - 'static/bidder-info/**.yaml'
+      - './static/bidder-info/**.yaml'
 
 jobs:
   build:
