@@ -40,6 +40,7 @@ jobs:
                 else
                   echo "userSync.redirect.url was not updated in $file"
                 fi
+                git diff --unified=0 HEAD^ HEAD -- "$file"
               fi
             fi
           done
