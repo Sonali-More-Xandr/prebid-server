@@ -23,6 +23,7 @@ jobs:
       - name: Check userSync.redirect.url in updated/added YAML files
         if: steps.check_changes.outputs.changed_files != ''
         run: |
+          echo "Changed files: ${{ steps.check_changes.outputs.changed_files }}"
           for file in ${{ steps.check_changes.outputs.changed_files }}; do
             if [ -f "$file" ]; then
               if git diff --name-only --diff-filter=A "${GITHUB_BASE_REF}..${GITHUB_HEAD_REF}" | grep -q "^$file$"; then
@@ -35,12 +36,16 @@ jobs:
               else
                 echo "File $file was updated in this PR"
                 prChanges=$(yq eval '.userSync.redirect.url' "$file")
+                echo "PR changes: $prChanges"
                 masterChanges=$(yq eval '.userSync.redirect.url' <(git show origin/master:$file))
+                echo "Master changes: $masterChanges"
                 if [ "$prChanges" != "$masterChanges" ]; then
                   echo "userSync.redirect.url was updated in $file"
                 else
                   echo "userSync.redirect.url was not updated in $file"
                 fi
               fi
+            else
+              echo "File $file does not exist"
             fi
           done
