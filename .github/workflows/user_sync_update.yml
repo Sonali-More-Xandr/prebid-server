@@ -31,6 +31,7 @@ jobs:
                 echo "File $file was added in this PR"
                 redirectURL="$(yq eval '.userSync.redirect.url' "$file")"
                 length=$(echo -n "$redirectURL" | wc -c)
+                echo "$redirectURL"
                 echo "Length of redirectURL string: $length"
                 if [ -z "$redirectURL" ]; then
                   echo "userSync.redirect.url not found in $file"
