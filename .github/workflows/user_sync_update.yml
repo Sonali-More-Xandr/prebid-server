@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "Changed files: ${{ steps.check_changes.outputs.changed_files }}"
           for file in ${{ steps.check_changes.outputs.changed_files }}; do
-            echo "$(git diff --name-only --diff-filter=A "${GITHUB_BASE_REF}..${GITHUB_HEAD_REF}")"
+            echo "$(git diff --name-only --diff-filter=A HEAD^ HEAD)"
             if [ -f "$file" ]; then
               if git diff --name-only --diff-filter=A "${GITHUB_BASE_REF}..${GITHUB_HEAD_REF}" | grep -q "^$file$"; then
                 echo "File $file was added in this PR"
