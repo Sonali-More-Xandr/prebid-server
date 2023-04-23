@@ -34,15 +34,13 @@ jobs:
                 fi
               else
                 echo "File $file was updated in this PR"
-                echo "$(git diff HEAD^ HEAD -- "$file" | grep -q -E '^ *redirect:.*\n[[:space:]]*(-|\+) *url:.*\s*' && echo true || echo false)"
-                if [ yq eval '.userSync.redirect.url' "$file" > /dev/null ] && [ $(git diff HEAD^ HEAD -- "$file" | grep -q -E '^\+ *url:' && echo true || echo false) ]; then
+                echo "$(git diff HEAD^ HEAD -- "$file" | grep -q '^\+ *url:' && echo true || echo false)"
+                if [ yq eval '.userSync.redirect.url' "$file" > /dev/null ] && [ $(git diff HEAD^ HEAD -- "$file" | grep -q '^\+ *url:' && echo true || echo false) ]; then
                   echo "userSync.redirect.url was updated in $file"
                 else
                   echo "userSync.redirect.url was not updated in $file"
                 fi
-                git diff HEAD^ HEAD -- "$file" > diff.yaml
-                cat diff.yaml
-                echo "$(yq eval '.userSync.redirect.url' diff.yaml)"
+                git diff HEAD^ HEAD -- "$file"
               fi
             fi
           done
