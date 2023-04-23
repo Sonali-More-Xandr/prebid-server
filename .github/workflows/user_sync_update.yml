@@ -33,10 +33,10 @@ jobs:
                 length=$(echo -n "$redirectURL" | wc -c)
                 echo "$redirectURL"
                 echo "Length of redirectURL string: $length"
-                if [ "$redirectURL" != null ] || [ $length != 0 ]; then
-                  echo "userSync.redirect.url found in $file"
-                else
+                if [ "$redirectURL" == null ] || [ $length == 0 ]; then
                   echo "userSync.redirect.url not found in $file"
+                else
+                  echo "userSync.redirect.url found in $file"
                 fi
               else
                 echo "File $file was updated in this PR"
