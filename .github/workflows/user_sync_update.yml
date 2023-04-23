@@ -40,7 +40,7 @@ jobs:
                 echo "File $file was updated in this PR"
                 prChanges=$(yq eval '.userSync.redirect.url' "$file")
                 echo "PR changes: $prChanges"
-                masterChanges=$(yq eval '.userSync.redirect.url' <(git show origin/master:$file) 2> /dev/null)
+                masterChanges=$(yq eval '.userSync.redirect.url' <(git show origin/master:$file))
                 echo "Master changes: $masterChanges"
                 if [ "$prChanges" != "$masterChanges" ]; then
                   echo "userSync.redirect.url was updated in $file"
