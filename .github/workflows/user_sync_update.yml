@@ -38,7 +38,7 @@ jobs:
                 masterChanges=$(yq eval '.userSync.redirect.url' <(git show origin/master:$file))
                 echo "$prChanges"
                 echo "$masterChanges"
-                if [ "$prChanges" -eq "$masterChanges" ]; then
+                if [ "$prChanges" == "$masterChanges" ]; then
                   echo "userSync.redirect.url was updated in $file"
                 else
                   echo "userSync.redirect.url was not updated in $file"
