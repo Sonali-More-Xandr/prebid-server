@@ -1,0 +1,6 @@
+https://ib.adnxs.com/prebid/setuid?bidder=axis&gdpr=&gdpr_consent=&f=i&uid=[UID]
+
+https://cs.axis-marketplace.com/pbserver?gdpr=&gdpr_consent=&ccpa=&redir=https%3A%2F%2Fib.adnxs.com%2Fprebid%2Fsetuid%3Fbidder%3Daxis%26gdpr%3D%26gdpr_consent%3D%26f%3Di%26uid%3D%5BUID%5D
+https://cs.axis-marketplace.com/pbserver?gdpr=&gdpr_consent=&ccpa=&redir=https%3A%2F%2Fib.adnxs.com%2Fprebid%2Fsetuid%3Fbidder%3Daxis%26gdpr%3D%26gdpr_consent%3D%26gpp%3D%26gpp_sid%3D%26f%3Di%26uid%3D%5BUID%5D
+
+https://ssp.disqus.com/redirectuser?gdpr=&gdpr_consent=&us_privacy=&r=https%3A%2F%2Fib.adnxs.com%2Fprebid%2Fsetuid%3Fbidder%3Dzeta_global_ssp%26gdpr%3D%26gdpr_consent%3D%26f%3Di%26uid%3DBUYERUID&partner=GET_SHORTNAME_FROM_ZETA
